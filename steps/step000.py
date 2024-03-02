@@ -3,9 +3,13 @@
 class Variable:
     def __init__(self, data):
         self.data = data 
+        self.grad = None
         
     def __repr__(self):
-        return f"<Variable(data={self.data})>"
+        if self.grad is None:
+            return f"<Variable(data={self.data:.2f})>"
+        else:
+            return f"<Variable(data={self.data:.2f}, grad={self.grad:.2f}, grad=True)>"
         
 if __name__ == "__main__":
     import numpy as np 
