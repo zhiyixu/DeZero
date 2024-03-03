@@ -1,19 +1,16 @@
-from abc import  abstractmethod
-from .basetypes import BaseFunction,BaseVariable
-from .step000 import Variable
+from abc import ABC, abstractmethod
+from core import Variable
 
-class Function(BaseFunction):
+class Function(ABC):
 
-    def __call__(self, input: BaseVariable) -> BaseVariable:
-        if not isinstance(input, (BaseVariable,)):
+    def __call__(self, input: Variable) -> Variable:
+        if not isinstance(input, (Variable,)):
             raise ValueError(
                 f"{type(self).__name__} class require Variable as input, got {type(input)}")
         self._input = input
         x = input.data
         y = self._forward(x)
         o = Variable(y)
-        o.set_creator(self)
-        self._o = o
         return o
 
     @abstractmethod
@@ -24,3 +21,15 @@ class Function(BaseFunction):
     def backward(self, gy):
         # this func should be public, loss func will call backward manually
         raise NotImplementedError()
+
+
+class A:
+
+    def func1(para1:B):
+        return B 
+    
+class B:
+
+    def func2(para1:A):
+        return A 
+     

@@ -3,7 +3,7 @@ sys.path.append(os.pardir)
 from steps.step003 import Exp
 from steps.step002 import Square
 from steps.step000 import Variable
-from steps import numerical_diff
+from steps.step004 import numerical_diff
 
 
 def f_composite(x:Variable) -> Variable:
