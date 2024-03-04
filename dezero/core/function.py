@@ -1,10 +1,13 @@
-from abc import ABC, abstractmethod
+import numpy as np
+from abc import abstractmethod
 from core import Variable
+from .base import BaseVariable, BaseFunction
 
-class Function(ABC):
 
-    def __call__(self, input: Variable) -> Variable:
-        if not isinstance(input, (Variable,)):
+class Function(BaseFunction):
+
+    def __call__(self, input: BaseVariable) -> BaseVariable:
+        if not isinstance(input, (BaseVariable,)):
             raise ValueError(
                 f"{type(self).__name__} class require Variable as input, got {type(input)}")
         self._input = input
@@ -23,13 +26,23 @@ class Function(ABC):
         raise NotImplementedError()
 
 
-class A:
+class Square(Function):
 
-    def func1(para1:B):
-        return B 
-    
-class B:
+    def _forward(self, x):
+        return x**2
 
-    def func2(para1:A):
-        return A 
-     
+    def backward(self, gy):
+        x = self._input.data
+        gx = 2 * x * gy
+        return gx  # Variable(gx) is better?
+
+
+class Exp(Function):
+
+    def _forward(self, x):
+        return np.exp(x)
+
+    def backward(self, gy):
+        x = self._input.data
+        gx = np.exp(x) * gy
+        return gx  # Variable(gx)

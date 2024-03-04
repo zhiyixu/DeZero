@@ -1,12 +1,13 @@
-from core import Function
+from .base import BaseFunction, BaseVariable
 
-class Variable:
+
+class Variable(BaseVariable):
     def __init__(self, data):
-        self.data = data 
+        self.data = data
         self.grad = None
         self.creator = None
-        
-    def set_creator(self, func:Function):
+
+    def set_creator(self, func: BaseFunction):
         self.creator = func
 
     def __repr__(self):
