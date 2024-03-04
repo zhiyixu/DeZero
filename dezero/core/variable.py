@@ -1,5 +1,6 @@
 from .base import BaseFunction, BaseVariable
 from typing import Union
+import numpy as np
 
 
 class Variable(BaseVariable):
@@ -21,12 +22,17 @@ class Variable(BaseVariable):
 
     def backward(self):
         # loop backward
-        creater_list = [self.creator]
-        for f in creater_list:
+        if self.grad is None:
+            self.grad = np.ones_like(self.data)
+
+        funcs = [self.creator]
+        while funcs:
+            f = funcs.pop()
             x = f.input
-            x.grad = f.backward(self.grad)
+            y = f.output  # f.output should be self?
+            x.grad = f.backward(y.grad)
             if x.creator:
-                creater_list.append(x.creator)
+                funcs.append(x.creator)
 
     def __repr__(self):
         if self.grad is None:

@@ -12,13 +12,13 @@ class Function(BaseFunction):
                 f"{type(self).__name__} class require Variable as input, got {type(input)}")
         self.input = input
         x = input.data
-        y = self._forward(x)
-        o = Variable(y)
-        o.set_creator(self)  # sotre the creator
-        return o
+        y = self.forward(x)
+        self.output = Variable(y)
+        self.output.set_creator(self)  # sotre the creator
+        return self.output
 
     @abstractmethod
-    def _forward(self, x):
+    def forward(self, x):
         raise NotImplementedError()
 
     @abstractmethod
@@ -28,8 +28,8 @@ class Function(BaseFunction):
 
 
 class Square(Function):
-
-    def _forward(self, x):
+    # x: the grad from up stream
+    def forward(self, x):
         return x**2
 
     def backward(self, gy):
@@ -40,10 +40,21 @@ class Square(Function):
 
 class Exp(Function):
 
-    def _forward(self, x):
+    def forward(self, x):
         return np.exp(x)
 
     def backward(self, gy):
         x = self.input.data
         gx = np.exp(x) * gy
         return gx  # Variable(gx)
+
+
+class Func(BaseFunction):
+
+    def square(x: BaseVariable):
+        f = Square()
+        return f(x)
+
+    def exp(x: BaseVariable):
+        f = Exp()
+        return f(x)
