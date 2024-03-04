@@ -11,13 +11,22 @@ class Variable(BaseVariable):
     def set_creator(self, func: Union[BaseFunction, None] = None):
         self.creator = func
 
+    # def backward(self):
+    #     # recursion backward
+    #     f = self.creator
+    #     if f:
+    #         x = f.input
+    #         x.grad = f.backward(self.grad)
+    #         x.backward()
+
     def backward(self):
-        # recursion backward
-        f = self.creator
-        if f:
+        # loop backward
+        creater_list = [self.creator]
+        for f in creater_list:
             x = f.input
             x.grad = f.backward(self.grad)
-            x.backward()
+            if x.creator:
+                creater_list.append(x.creator)
 
     def __repr__(self):
         if self.grad is None:
