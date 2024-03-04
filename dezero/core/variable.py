@@ -1,4 +1,5 @@
 from .base import BaseFunction, BaseVariable
+from typing import Union
 
 
 class Variable(BaseVariable):
@@ -7,8 +8,15 @@ class Variable(BaseVariable):
         self.grad = None
         self.creator = None
 
-    def set_creator(self, func: BaseFunction):
+    def set_creator(self, func: Union[BaseFunction, None] = None):
         self.creator = func
+
+    def backward(self):
+        f = self.creator
+        if f:
+            x = f.input
+            x.grad = f.backward(self.grad)
+            x.backward()
 
     def __repr__(self):
         if self.grad is None:

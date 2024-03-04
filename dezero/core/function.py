@@ -10,10 +10,11 @@ class Function(BaseFunction):
         if not isinstance(input, (BaseVariable,)):
             raise ValueError(
                 f"{type(self).__name__} class require Variable as input, got {type(input)}")
-        self._input = input
+        self.input = input
         x = input.data
         y = self._forward(x)
         o = Variable(y)
+        o.set_creator(self)  # sotre the creator
         return o
 
     @abstractmethod
@@ -32,7 +33,7 @@ class Square(Function):
         return x**2
 
     def backward(self, gy):
-        x = self._input.data
+        x = self.input.data
         gx = 2 * x * gy
         return gx  # Variable(gx) is better?
 
@@ -43,6 +44,6 @@ class Exp(Function):
         return np.exp(x)
 
     def backward(self, gy):
-        x = self._input.data
+        x = self.input.data
         gx = np.exp(x) * gy
         return gx  # Variable(gx)
