@@ -13,7 +13,5 @@ if __name__ == "__main__":
     b = Func.exp(a)
     y = Func.square(b)
 
-    y.grad = np.array(1.)
-
     y.backward()
     print(a, b, x, y)

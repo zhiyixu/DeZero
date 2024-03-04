@@ -5,6 +5,9 @@ import numpy as np
 
 class Variable(BaseVariable):
     def __init__(self, data):
+        if data is not None:
+            if not isinstance(data, np.ndarray):
+                return TypeError(f"{type(data)} is not support, currently np.ndarray only.")
         self.data = data
         self.grad = None
         self.creator = None

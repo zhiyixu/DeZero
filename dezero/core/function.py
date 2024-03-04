@@ -2,18 +2,19 @@ import numpy as np
 from abc import abstractmethod
 from core import Variable
 from .base import BaseVariable, BaseFunction
+from .utils import Utils
 
 
 class Function(BaseFunction):
 
     def __call__(self, input: BaseVariable) -> BaseVariable:
         if not isinstance(input, (BaseVariable,)):
-            raise ValueError(
+            raise TypeError(
                 f"{type(self).__name__} class require Variable as input, got {type(input)}")
         self.input = input
         x = input.data
         y = self.forward(x)
-        self.output = Variable(y)
+        self.output = Variable(Utils.as_array(y))
         self.output.set_creator(self)  # sotre the creator
         return self.output
 
