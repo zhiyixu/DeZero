@@ -12,6 +12,7 @@ class Variable(BaseVariable):
         self.creator = func
 
     def backward(self):
+        # recursion backward
         f = self.creator
         if f:
             x = f.input
