@@ -7,16 +7,21 @@ from .utils import Utils
 
 class Function(BaseFunction):
 
-    def __call__(self, input: BaseVariable) -> BaseVariable:
-        if not isinstance(input, (BaseVariable,)):
-            raise TypeError(
-                f"{type(self).__name__} class require Variable as input, got {type(input)}")
-        self.input = input
-        x = input.data
-        y = self.forward(x)
-        self.output = Variable(Utils.as_array(y))
-        self.output.set_creator(self)  # sotre the creator
-        return self.output
+    def __call__(self, *inputs: BaseVariable) -> BaseVariable:
+        for in_data in inputs:
+            if not isinstance(in_data, (BaseVariable,)):
+                raise TypeError(
+                    f"{type(self).__name__} class require Variable as input, got {type(in_data)}")
+            
+        self.inputs = inputs
+        xs = [x.data for x in self.inputs]
+        ys = self.forward(*xs)
+        if not isinstance(ys, tuple):
+            ys = (ys,)
+        self.outputs = [Variable(Utils.as_array(y)) for y in ys]
+        for o in self.outputs:
+            o.set_creator(self)
+        return self.outputs[0] if len(self.outputs)==1 else self.outputs
 
     @abstractmethod
     def forward(self, x):
@@ -34,9 +39,9 @@ class Square(Function):
         return x**2
 
     def backward(self, gy):
-        x = self.input.data
-        gx = 2 * x * gy
-        return gx  # Variable(gx) is better?
+        xs = self.inputs
+        gx = tuple([2 * x.data * gy for x in xs])
+        return gx[0] if len(gx)==1 else gx  # Variable(gx) is better?
 
 
 class Exp(Function):
@@ -45,10 +50,18 @@ class Exp(Function):
         return np.exp(x)
 
     def backward(self, gy):
-        x = self.input.data
-        gx = np.exp(x) * gy
-        return gx  # Variable(gx)
+        xs = self.inputs
+        gx = tuple([np.exp(x.data) * gy for x in xs])
+        return gx[0] if len(gx)==1 else gx  # Variable(gx)
 
+class Add(Function):
+
+    def forward(self, a, b):
+        return a+b
+    
+    def backward(self, gy):
+        return None
+        
 
 class Func(BaseFunction):
 
@@ -59,3 +72,7 @@ class Func(BaseFunction):
     def exp(x: BaseVariable):
         f = Exp()
         return f(x)
+    
+    def add(x: BaseVariable, y: BaseVariable):
+        f = Add()
+        return f(x,y)

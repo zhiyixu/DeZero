@@ -31,11 +31,12 @@ class Variable(BaseVariable):
         funcs = [self.creator]
         while funcs:
             f = funcs.pop()
-            x = f.input
-            y = f.output  # f.output should be self?
-            x.grad = f.backward(y.grad)
-            if x.creator:
-                funcs.append(x.creator)
+            # y = f.outputs  # f.output should be self?
+            for x in f.inputs:
+                for y in f.outputs:
+                    x.grad = f.backward(y.grad)
+                    if x.creator:
+                        funcs.append(x.creator)
 
     def __repr__(self):
         if self.grad is None:
