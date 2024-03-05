@@ -1,17 +1,28 @@
-import os  # NOQA: E402
-import sys  # NOQA: E402
-sys.path.append(os.pardir)  # NOQA: E402
-from core import Variable
-from core import Func
+import os,sys # NOQA: E402
+sys.path.append(os.pardir) # NOQA: E402
+
+import unittest
+from dezero.core import Variable
+from dezero.core import Func
+from dezero.core import numerical_diff
 import numpy as np
 
+class SquareTest(unittest.TestCase):
 
-if __name__ == "__main__":
-    x = Variable(np.array(.5))
+    def test_square(self):
+        x = Variable(np.array(2))
+        y = Func.square(x)
+        z = Variable(np.array(4.))
+        self.assertEqual(y.data, z.data)
 
-    a = Func.square(x)
-    b = Func.exp(a)
-    y = Func.square(b)
+    def test_backwards(self):
+        x = Variable(np.random.rand(1))
+        y = Func.exp(x)
+        y.backward()
+        z = numerical_diff(f=Func.exp, x=x)
+        flg = np.allclose(x.grad,z.data)
+        self.assertTrue(flg)
 
-    y.backward()
-    print(a, b, x, y)
+
+
+unittest.main()

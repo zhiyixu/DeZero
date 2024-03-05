@@ -39,6 +39,6 @@ class Variable(BaseVariable):
 
     def __repr__(self):
         if self.grad is None:
-            return f"<Variable(data={self.data:.2f})>"
+            return f"<Variable(data={self.data})>"
         else:
-            return f"<Variable(data={self.data:.2f}, grad={self.grad:.2f}, grad=True)>"
+            return f"<Variable(data={self.data}, grad={self.grad}, grad=True)>"

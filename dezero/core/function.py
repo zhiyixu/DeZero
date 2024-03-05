@@ -1,6 +1,6 @@
 import numpy as np
 from abc import abstractmethod
-from core import Variable
+from .variable import Variable
 from .base import BaseVariable, BaseFunction
 from .utils import Utils
 
