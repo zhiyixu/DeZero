@@ -37,11 +37,18 @@ class Variable(BaseVariable):
                 gxs = (gxs, )
 
             for x, gx in zip(f.inputs, gxs):
-                x.grad=gx 
+                if x.grad is None:
+                    x.grad=gx
+                else:
+                    x.grad = x.grad + gx  # x.grad += gx will cause error 
 
                 if x.creator is not None:
                     funcs.append(x.creator)
 
+    
+    def clean_grad(self):
+        self.grad = None
+    
     def __repr__(self):
         if self.grad is None:
             return f"<Variable(data={self.data})>"

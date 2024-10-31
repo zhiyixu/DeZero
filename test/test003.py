@@ -8,11 +8,11 @@ import numpy as np
 
 
 x = Variable(np.array(2.))
-y = Variable(np.array(3.))
 
-z = F.add(F.square(x), F.square(y))
-z.backward()
 
-print(z.data)
-print(x.grad)
+y = F.add(x, F.add(x,x))
+y.backward()
+
+print(y.data)
 print(y.grad)
+print(x.grad)
