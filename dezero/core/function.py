@@ -39,9 +39,9 @@ class Square(Function):
         return x**2
 
     def backward(self, gy):
-        xs = self.inputs
-        gx = tuple([2 * x.data * gy for x in xs])
-        return gx[0] if len(gx)==1 else gx  # Variable(gx) is better?
+        x = self.inputs[0].data  # inputs is a tuple
+        gx = 2 * x * gy
+        return gx   # Variable(gx) is better?
 
 
 class Exp(Function):
@@ -60,11 +60,17 @@ class Add(Function):
         return a+b
     
     def backward(self, gy):
-        return None
+        """
+        why return gy twice: in add func, we have two inputs and one output
+        when backward, we only call var.backward onece, but we should return both grad
+        """
+        return gy, gy # only return gy
         
 
 class Func(BaseFunction):
-
+    """
+    wapper of funcs above
+    """
     def square(x: BaseVariable):
         f = Square()
         return f(x)

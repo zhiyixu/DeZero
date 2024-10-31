@@ -31,12 +31,16 @@ class Variable(BaseVariable):
         funcs = [self.creator]
         while funcs:
             f = funcs.pop()
-            # y = f.outputs  # f.output should be self?
-            for x in f.inputs:
-                for y in f.outputs:
-                    x.grad = f.backward(y.grad)
-                    if x.creator:
-                        funcs.append(x.creator)
+            gys = [o.grad for o in f.outputs]
+            gxs = f.backward(*gys)
+            if not isinstance(gxs, tuple):
+                gxs = (gxs, )
+
+            for x, gx in zip(f.inputs, gxs):
+                x.grad=gx 
+
+                if x.creator is not None:
+                    funcs.append(x.creator)
 
     def __repr__(self):
         if self.grad is None:
