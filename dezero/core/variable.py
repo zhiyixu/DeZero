@@ -11,27 +11,32 @@ class Variable(BaseVariable):
         self.data = data
         self.grad = None
         self.creator = None
+        self.generation = 0
 
     def set_creator(self, func: Union[BaseFunction, None] = None):
         self.creator = func
-
-    # def backward(self):
-    #     # recursion backward
-    #     f = self.creator
-    #     if f:
-    #         x = f.input
-    #         x.grad = f.backward(self.grad)
-    #         x.backward()
+        self.generation = func.generation + 1
 
     def backward(self):
         # loop backward
         if self.grad is None:
             self.grad = np.ones_like(self.data)
 
-        funcs = [self.creator]
+        funcs = []
+        seen_set = set() 
+
+        def add_func(f):
+            if f not in seen_set:
+                funcs.append(f)
+                seen_set.add(f)
+                funcs.sort(key=lambda x: x.generation)
+
+        add_func(self.creator)
+
         while funcs:
             f = funcs.pop()
-            gys = [o.grad for o in f.outputs]
+            # o is a weakref, thus we take o() instead of o
+            gys = [o().grad for o in f.outputs]
             gxs = f.backward(*gys)
             if not isinstance(gxs, tuple):
                 gxs = (gxs, )
@@ -43,7 +48,7 @@ class Variable(BaseVariable):
                     x.grad = x.grad + gx  # x.grad += gx will cause error 
 
                 if x.creator is not None:
-                    funcs.append(x.creator)
+                    add_func(x.creator)
 
     
     def clean_grad(self):

@@ -9,8 +9,9 @@ import numpy as np
 
 x = Variable(np.array(2.))
 
+a = F.square(x)
+y = F.add(F.square(a), F.square(a))
 
-y = F.add(x, F.add(x,x))
 y.backward()
 
 print(y.data)

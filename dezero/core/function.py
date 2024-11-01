@@ -3,7 +3,7 @@ from abc import abstractmethod
 from .variable import Variable
 from .base import BaseVariable, BaseFunction
 from .utils import Utils
-
+import weakref
 
 class Function(BaseFunction):
 
@@ -18,7 +18,8 @@ class Function(BaseFunction):
         ys = self.forward(*xs)
         if not isinstance(ys, tuple):
             ys = (ys,)
-        self.outputs = [Variable(Utils.as_array(y)) for y in ys]
+        self.outputs = [weakref.ref(Variable(Utils.as_array(y))) for y in ys]
+        self.generation = max([x.generation for x in self.inputs])
         for o in self.outputs:
             o.set_creator(self)
         return self.outputs[0] if len(self.outputs)==1 else self.outputs
